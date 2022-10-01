@@ -58,12 +58,30 @@ func delMovie(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "movie not found"})
 }
 
+func updateMovie(c *gin.Context) {
+	id := c.Param("id")
+
+	for i, a := range movies {
+		if a.ID == id {
+			var newMovie movie
+			if err := c.BindJSON(&newMovie); err != nil {
+				return
+			}
+			movies[i] = newMovie
+			c.IndentedJSON(http.StatusOK, newMovie)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "movie not found"})
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/movies", getMovies)
 	router.GET("/movies/:id", getMovieByID)
 	router.POST("/movies", postMovies)
 	router.DELETE("/movies/:id", delMovie)
+	router.PUT("/movies/:id", updateMovie)
 
 	router.Run("localhost:8080")
 }
